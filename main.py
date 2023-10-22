@@ -8,10 +8,10 @@ pygame.init()
 # Constants
 WIDTH, HEIGHT = 1280, 720
 BACKGROUND_COLOR = (255, 255, 255)
-CANDY_SIZE = (70, 25)
-SPRING_WIDTH = 20
+CANDY_SIZE = (90, 35)
+SPRING_WIDTH = 50
 MIN_STACK_CAPACITY = 7
-SPRING_HEIGHT = 200
+SPRING_HEIGHT = 300
 SPRING_CONSTANT = 0.8
 CANDY_FORCE = 10
 
@@ -20,80 +20,117 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Candy Spring Stack")
 font = pygame.font.Font('freesansbold.ttf', 20)
 
-
-
 # Initialize the Stack
 candy_stack = Stack()
 
 
 class Button:
     def __init__(self, name, x, y):
-        self.name = name
-        self.width = 150
-        self.height = 50
-        self.rect = pygame.rect.Rect(x, y, self.width, self.height)
-        self.enabled = True
+        self._name = name
+        self._width = 150
+        self._height = 50
+        self._rect = pygame.rect.Rect(x, y, self._width, self._height)
+        self._enabled = True
 
     def draw(self):
-        pygame.draw.rect(screen, 'black', self.rect, 2)
-        text = font.render(self.name, True, 'black')
-        screen.blit(text, (self.rect.centerx - text.get_width() // 2, self.rect.centery - text.get_height() // 2))
+        pygame.draw.rect(screen, 'black', self._rect, 2)
+        text = font.render(self._name, True, 'black')
+        screen.blit(text, (self._rect.centerx - text.get_width() // 2, self._rect.centery - text.get_height() // 2))
 
     def is_clicked(self, mouse_pos):
-        return self.rect.collidepoint(mouse_pos)
+        return self._rect.collidepoint(mouse_pos)
+
+    def get_name(self):
+        return self._name
+
+
+class Display:
+    def __init__(self):
+        self._result = None
+        self._color = 'black'
+
+    def show(self):
+        text = font.render(str(self._result), True, self._color)
+        textRect = pygame.rect.Rect(750, 100, 50, 100)
+        screen.blit(text, textRect)
+
+    def set_result(self, info, color='black'):
+        self._result = info
+        self._color = color
+
+    def get_result(self):
+        return self._result
 
 
 class Candy:
     def __init__(self, color):
-        self.color = color
+        self._label = random.randint(0, 1000)
+        self._color = color
 
     def draw(self, x, y):
-        pygame.draw.ellipse(screen, self.color, (x, y, CANDY_SIZE[0], CANDY_SIZE[1]))
+        candyRect = pygame.rect.Rect(x, y, CANDY_SIZE[0], CANDY_SIZE[1])
+        pygame.draw.ellipse(screen, self._color, candyRect)
+        text = font.render(str(self._label), True, 'black')
+        textRect = pygame.rect.Rect(x - 40, y + 5, CANDY_SIZE[0], CANDY_SIZE[1])
+        screen.blit(text, textRect)
+
+    def get_candy(self):
+        return self._label
 
 
 class Dispenser:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.width = SPRING_WIDTH * 4
-        self.height = SPRING_HEIGHT
+        self._x = x
+        self._y = y
+        self._width = SPRING_WIDTH * 4
+        self._height = SPRING_HEIGHT
 
     def draw(self):
-        pygame.draw.lines(screen, 'black', False, [(self.x, self.y), (self.x, self.y + self.height),
-                                                   (self.x + self.width, self.y + self.height),
-                                                   (self.x + self.width, self.y)])
+        pygame.draw.lines(screen, 'black', False, [(self._x, self._y), (self._x, self._y + self._height),
+                                                   (self._x + self._width, self._y + self._height),
+                                                   (self._x + self._width, self._y)], 2)
 
 
 class Spring:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.height = SPRING_HEIGHT
-        self.dispenser_x = WIDTH // 2 - SPRING_WIDTH * 2
-        self.rect = pygame.Rect(self.x, self.y, SPRING_WIDTH, self.height)
+        self._x = x
+        self._y = y
+        self._height = SPRING_HEIGHT
+        self._top_plate_x = WIDTH // 2 - SPRING_WIDTH * 2
+        # self._rect = pygame.Rect(self._x, self._y, SPRING_WIDTH, self._height)
 
     def draw(self):
-        pygame.draw.rect(screen, 'black', self.rect)
-        pygame.draw.line(screen, 'black', (self.dispenser_x, self.y), (self.dispenser_x + SPRING_WIDTH * 4, self.y), 3)
+        pygame.draw.line(screen, 'black', (self._top_plate_x, self._y), (self._top_plate_x + SPRING_WIDTH * 4, self._y),
+                         8)
+        image = pygame.image.load('spring.png')
+        image = pygame.transform.scale(image, (SPRING_WIDTH, self._height))
+        screen.blit(image, (self._x, self._y, 5, self._height))
 
     def adjust(self, operation):
         extension = CANDY_FORCE / SPRING_CONSTANT
         if operation == 'push':
-            if self.height - extension > 20:
-                self.height -= extension
-                self.y += extension
-            else:
-                self.height = 20
+            if self._height - extension >= 25:
+                self._height -= extension
+                self._y += extension
         elif operation == 'pop':
-            if self.height + extension > SPRING_HEIGHT:
-                self.height = SPRING_HEIGHT
+            if self._height + extension > SPRING_HEIGHT:
+                self._height = SPRING_HEIGHT
             else:
-                self.height += extension
-                self.y -= extension
+                self._height += extension
+                self._y -= extension
+
+    # @property
+    # def get_rect(self):
+    #     return self._rect
+
+    @property
+    def get_y(self):
+        return self._y
 
 
-spring = Spring(WIDTH // 2 - SPRING_WIDTH // 2, 300)
-dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, 300)
+spring = Spring(WIDTH // 2 - SPRING_WIDTH // 2, HEIGHT // 2)
+dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, HEIGHT // 2)
+display_info = Display()
 
 buttons = [
     Button('Pop', 10, 10),
@@ -107,7 +144,6 @@ buttons = [
 def add_candy():
     if not candy_stack.is_empty():
         spring.adjust('push')
-    # color = random.choice(CANDY_COLORS)
     color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     candy = Candy(color)
     candy_stack.push(candy)
@@ -119,24 +155,26 @@ def remove_candy():
         if candy is not None:
             spring.adjust('pop')
     except Empty:
-        print("Cannot remove candy: The container is empty.")
+        display_info.set_result("Error : Stack is empty", 'red')
 
 
 def is_empty():
-    return candy_stack.is_empty()
+    if candy_stack.is_empty():
+        display_info.set_result("Error : Stack is empty", 'red')
+    else:
+        display_info.set_result("Stack is not empty.")
 
 
 def get_length():
-    return len(candy_stack)
+    display_info.set_result(f"Stack Length : {len(candy_stack)}")
 
 
-def get_top_candy_color():
+def get_top_candy():
     try:
         top_candy = candy_stack.top()
-        return top_candy.color
+        display_info.set_result(f"Top Candy Color : {top_candy.get_candy()}")
     except Empty:
-        print('Error : Stack is empty')
-        return None
+        display_info.set_result('Error : Stack is empty', 'red')
 
 
 running = True
@@ -150,40 +188,33 @@ while running:
             mouse_pos = pygame.mouse.get_pos()
             for button in buttons:
                 if button.is_clicked(mouse_pos):
-                    if button.name == 'Pop':
+                    if button.get_name() == 'Pop':
                         remove_candy()
-                    elif button.name == 'Push':
+                    elif button.get_name() == 'Push':
                         add_candy()
-                    elif button.name == 'Top':
-                        top_color = get_top_candy_color()
-                        if top_color:
-                            print(f"Top Candy Color: {top_color}")
-                    elif button.name == 'Is Empty':
-                        empty_status = is_empty()
-                        if empty_status:
-                            print("Error: Stack is empty.")
-                        else:
-                            print("Stack is not empty.")
-                    elif button.name == 'Len':
-                        stack_length = get_length()
-                        print(f"Stack Length: {stack_length}")
+                    elif button.get_name() == 'Top':
+                        get_top_candy()
+                    elif button.get_name() == 'Is Empty':
+                        is_empty()
+                    elif button.get_name() == 'Len':
+                        get_length()
 
     screen.fill('white')
 
     # Draw the dispenser
     dispenser.draw()
 
-    # Draw the spring
-    spring.rect.height = spring.height
-    spring.rect.y = spring.y
+    if display_info.get_result():
+        display_info.show()
+
     spring.draw()
 
     # Draw the candies in the stack
-    x = WIDTH // 2 - SPRING_WIDTH * 1.7
-    y = spring.y - CANDY_SIZE[1]
-    for candy in candy_stack.items:
+    x = WIDTH // 2 - CANDY_SIZE[0] // 2
+    y = spring.get_y - CANDY_SIZE[1]
+    for candy in candy_stack.getitem():
         candy.draw(x, y)
-        y -= CANDY_SIZE[1] + 5
+        y -= CANDY_SIZE[1] + 3
 
     # Draw buttons
     for button in buttons:

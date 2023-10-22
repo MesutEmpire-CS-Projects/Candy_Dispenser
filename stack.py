@@ -7,26 +7,29 @@ class Empty(Exception):
 # Define the Stack class
 class Stack:
     def __init__(self):
-        self.items = []
+        self._items = []
 
     def __len__(self):
-        return len(self.items)
+        return len(self._items)
 
     def is_empty(self):
-        return len(self.items) == 0
+        return len(self._items) == 0
 
     def push(self, item):
-        self.items.append(item)
+        self._items.append(item)
 
     def pop(self):
         if not self.is_empty():
-            return self.items.pop()
+            return self._items.pop()
         else:
             raise Empty()
 
     def top(self):
         if not self.is_empty():
-            return self.items[-1]
+            return self._items[-1]
         else:
             raise Empty()
+
+    def getitem(self):
+        return self._items
 
