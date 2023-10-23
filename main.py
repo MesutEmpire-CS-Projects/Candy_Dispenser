@@ -1,13 +1,14 @@
-import pygame
 import random
-from stack import Stack, Empty
+
+import pygame
+
+from stack import ArrayStack, Empty
 
 # Initialize Pygame
 pygame.init()
 
 # Constants
 WIDTH, HEIGHT = 1280, 720
-BACKGROUND_COLOR = (255, 255, 255)
 CANDY_SIZE = (90, 35)
 SPRING_WIDTH = 50
 MIN_STACK_CAPACITY = 7
@@ -17,11 +18,14 @@ CANDY_FORCE = 10
 
 # Initialize the screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Candy Spring Stack")
+pygame.display.set_caption("Candy Stack Dispenser")
 font = pygame.font.Font('freesansbold.ttf', 20)
 
 # Initialize the Stack
-candy_stack = Stack()
+candy_stack = ArrayStack()
+
+
+# candy_stack = LinkedStack()
 
 
 class Button:
@@ -96,8 +100,7 @@ class Spring:
         self._x = x
         self._y = y
         self._height = SPRING_HEIGHT
-        self._top_plate_x = WIDTH // 2 - SPRING_WIDTH * 2
-        # self._rect = pygame.Rect(self._x, self._y, SPRING_WIDTH, self._height)
+        self._top_plate_x = WIDTH // 2 - SPRING_WIDTH * 2  # self._rect = pygame.Rect(self._x, self._y, SPRING_WIDTH, self._height)
 
     def draw(self):
         pygame.draw.line(screen, 'black', (self._top_plate_x, self._y), (self._top_plate_x + SPRING_WIDTH * 4, self._y),
@@ -132,13 +135,8 @@ spring = Spring(WIDTH // 2 - SPRING_WIDTH // 2, HEIGHT // 2)
 dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, HEIGHT // 2)
 display_info = Display()
 
-buttons = [
-    Button('Pop', 10, 10),
-    Button('Push', 10, 70),
-    Button('Top', 10, 130),
-    Button('Is Empty', 10, 190),
-    Button('Len', 10, 250)
-]
+buttons = [Button('Pop', 10, 10), Button('Push', 10, 70), Button('Top', 10, 130), Button('Is Empty', 10, 190),
+    Button('Len', 10, 250)]
 
 
 def add_candy():
@@ -172,7 +170,7 @@ def get_length():
 def get_top_candy():
     try:
         top_candy = candy_stack.top()
-        display_info.set_result(f"Top Candy Color : {top_candy.get_candy()}")
+        display_info.set_result(f"Top Candy Label : {top_candy.get_candy()}")
     except Empty:
         display_info.set_result('Error : Stack is empty', 'red')
 
@@ -212,7 +210,7 @@ while running:
     # Draw the candies in the stack
     x = WIDTH // 2 - CANDY_SIZE[0] // 2
     y = spring.get_y - CANDY_SIZE[1]
-    for candy in candy_stack.getitem():
+    for candy in candy_stack._items:
         candy.draw(x, y)
         y -= CANDY_SIZE[1] + 3
 
