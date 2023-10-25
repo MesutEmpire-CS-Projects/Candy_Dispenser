@@ -62,6 +62,9 @@ class Display:
         self._result = info
         self._color = color
 
+    def reset_result(self):
+        self._result = None
+
     def get_result(self):
         return self._result
 
@@ -145,6 +148,7 @@ def add_candy():
     color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
     candy = Candy(color)
     candy_stack.push(candy)
+    display_info.reset_result()
 
 
 def remove_candy():
@@ -152,6 +156,7 @@ def remove_candy():
         candy = candy_stack.pop()
         if candy is not None:
             spring.adjust('pop')
+            display_info.set_result(f'Popped : {candy.get_candy()}')
     except Empty:
         display_info.set_result("Error : Stack is empty", 'red')
 
