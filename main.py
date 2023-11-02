@@ -12,9 +12,11 @@ WIDTH, HEIGHT = 1280, 720
 CANDY_SIZE = (90, 35)
 SPRING_WIDTH = 50
 MIN_STACK_CAPACITY = 7
-SPRING_HEIGHT = 300
+SPRING_HEIGHT = (HEIGHT * 3 / 4 - 40)
 SPRING_CONSTANT = 0.8
-CANDY_FORCE = 10
+CANDY_FORCE = 20
+CANDY_SPACE = 3
+EXTENSION = CANDY_SIZE[1] + CANDY_SPACE
 
 # Initialize the screen
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -96,6 +98,8 @@ class Dispenser:
         pygame.draw.lines(screen, 'black', False, [(self._x, self._y), (self._x, self._y + self._height),
                                                    (self._x + self._width, self._y + self._height),
                                                    (self._x + self._width, self._y)], 2)
+        pygame.draw.line(screen, 'black', (self._x, self._y), (self._x + self._width, self._y),
+                         8)
 
 
 class Spring:
@@ -113,17 +117,16 @@ class Spring:
         screen.blit(image, (self._x, self._y, 5, self._height))
 
     def adjust(self, operation):
-        extension = CANDY_FORCE / SPRING_CONSTANT
         if operation == 'push':
-            if self._height - extension >= 25:
-                self._height -= extension
-                self._y += extension
+            if self._height - EXTENSION >= 25:
+                self._height -= EXTENSION
+                self._y += EXTENSION
         elif operation == 'pop':
-            if self._height + extension > SPRING_HEIGHT:
+            if self._height + EXTENSION > SPRING_HEIGHT:
                 self._height = SPRING_HEIGHT
             else:
-                self._height += extension
-                self._y -= extension
+                self._height += EXTENSION
+                self._y -= EXTENSION
 
     # @property
     # def get_rect(self):
@@ -133,9 +136,12 @@ class Spring:
     def get_y(self):
         return self._y
 
+    def get_height(self):
+        return self._height
 
-spring = Spring(WIDTH // 2 - SPRING_WIDTH // 2, HEIGHT // 2)
-dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, HEIGHT // 2)
+
+spring = Spring(WIDTH // 2 - SPRING_WIDTH // 2, HEIGHT * 1 / 4)
+dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, HEIGHT * 1 / 4)
 display_info = Display()
 
 buttons = [Button('Pop', 10, 10), Button('Push', 10, 70), Button('Top', 10, 130), Button('Is Empty', 10, 190),
@@ -143,12 +149,14 @@ buttons = [Button('Pop', 10, 10), Button('Push', 10, 70), Button('Top', 10, 130)
 
 
 def add_candy():
-    if not candy_stack.is_empty():
+    if spring.get_height() - EXTENSION >= 25:
         spring.adjust('push')
-    color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-    candy = Candy(color)
-    candy_stack.push(candy)
-    display_info.reset_result()
+        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        candy = Candy(color)
+        candy_stack.push(candy)
+        display_info.reset_result()
+    else:
+        display_info.set_result("Stack is full", 'red')
 
 
 def remove_candy():
@@ -217,7 +225,7 @@ while running:
     y = spring.get_y - CANDY_SIZE[1]
     for candy in candy_stack._items:
         candy.draw(x, y)
-        y -= CANDY_SIZE[1] + 3
+        y -= CANDY_SIZE[1] + CANDY_SPACE
 
     # Draw buttons
     for button in buttons:
