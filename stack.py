@@ -11,21 +11,21 @@ class ArrayStack:
     """
 
     def __init__(self):
-        self._items = []
+        self.items = []
 
     def __len__(self):
         """
         Return the number of items in the stack.
         :return: Returns an integer
         """
-        return len(self._items)
+        return len(self.items)
 
     def is_empty(self):
         """
         Check whether the stack is empty
          :return: Returns a boolean
          """
-        return len(self._items) == 0
+        return len(self.items) == 0
 
     def push(self, item):
         """
@@ -33,7 +33,7 @@ class ArrayStack:
         :param item:
         :return: Does not return any value
         """
-        self._items.append(item)
+        self.items.append(item)
 
     def pop(self):
         """
@@ -41,7 +41,7 @@ class ArrayStack:
         :return: Returns the item removed
         """
         if not self.is_empty():
-            return self._items.pop()
+            return self.items.pop()
         else:
             raise Empty()
 
@@ -51,16 +51,9 @@ class ArrayStack:
         :return: If the stack is not empty returns the item at the top of the stack otherwise returns an Empty Exception
         """
         if not self.is_empty():
-            return self._items[-1]
+            return self.items[-1]
         else:
             raise Empty()
-
-    # def get_items(self):
-    #     """
-    #     Retrieve the items in the stack
-    #     :return: Returns all the items in the stack
-    #     """
-    #     return self._items
 
 
 if __name__ == '__main__':
