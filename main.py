@@ -71,9 +71,9 @@ class Display:
 
 
 class Candy:
-    def __init__(self, color):
+    def __init__(self):
         self._label = random.randint(0, 1000)
-        self._color = color
+        self._color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
 
     def draw(self, x, y):
         candy_rect = pygame.rect.Rect(x, y, CANDY_SIZE[0], CANDY_SIZE[1])
@@ -172,8 +172,7 @@ def add_candy():
     if dispenser.get_spring_height() - EXTENSION >= 25:
         dispenser.open_lid()
         dispenser.adjust_spring('push')
-        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-        added_candy = Candy(color)
+        added_candy = Candy()
         candy_stack.push(added_candy)
         display_info.reset_result()
         threading.Timer(0.5, dispenser.close_lid).start()
