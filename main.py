@@ -13,8 +13,6 @@ CANDY_SIZE = (90, 35)
 SPRING_WIDTH = 50
 MIN_STACK_CAPACITY = 7
 SPRING_HEIGHT = (HEIGHT * 3 / 4 - 40)
-SPRING_CONSTANT = 0.8
-CANDY_FORCE = 20
 CANDY_SPACE = 3
 EXTENSION = CANDY_SIZE[1] + CANDY_SPACE
 
@@ -145,7 +143,7 @@ dispenser = Dispenser(WIDTH // 2 - SPRING_WIDTH * 2, HEIGHT * 1 / 4)
 display_info = Display()
 
 buttons = [Button('Pop', 10, 10), Button('Push', 10, 70), Button('Top', 10, 130), Button('Is Empty', 10, 190),
-    Button('Len', 10, 250)]
+           Button('Len', 10, 250)]
 
 
 def add_candy():
