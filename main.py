@@ -13,7 +13,6 @@ pygame.init()
 WIDTH, HEIGHT = 1280, 720
 CANDY_SIZE = (90, 35)
 SPRING_WIDTH = 50
-MIN_STACK_CAPACITY = 7
 SPRING_HEIGHT = (HEIGHT * 3 / 4 - 40)
 EXTENSION = CANDY_SIZE[1]
 
@@ -24,10 +23,7 @@ font = pygame.font.Font('freesansbold.ttf', 20)
 
 # Initialize the Stack
 candy_stack = ArrayStack()
-
-
 # candy_stack = LinkedStack()
-
 
 class Button:
     def __init__(self, name, x, y):
